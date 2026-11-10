@@ -1,0 +1,40 @@
+<!-- 工具页内容片段（运行时内容已内联于 index.html 的 .page-track 中，此处为模块化源文件，需保持同步） -->
+<!-- 工具页：单屏文件转换，拖拽/点击导入，按扩展名显示目标格式（演示，核心转换未实现） -->
+<section class="page" data-page="tools">
+  <div class="page-inner tools-inner">
+    <div class="tools-head">
+      <h2 class="page-title">文件转换</h2>
+      <p class="page-subtitle">拖拽或点击导入文件，自动识别格式并给出转换选项</p>
+    </div>
+
+    <!-- 空状态：导入区 -->
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="file-input" hidden />
+      <i class="bi bi-cloud-arrow-up dz-icon"></i>
+      <p class="dz-title">拖拽文件到此处</p>
+      <p class="dz-hint">或点击选择 · 支持视频 / 文档 / 图书 / 图片 / 音频</p>
+    </div>
+
+    <!-- 已导入状态：转换面板 -->
+    <div class="convert-panel" id="convert-panel" hidden>
+      <div class="file-card">
+        <i class="bi bi-file-earmark-text" id="file-icon"></i>
+        <div class="file-meta">
+          <div class="file-name" id="file-name">文件名.ext</div>
+          <div class="file-info" id="file-info">大小 · 类型</div>
+        </div>
+        <button class="icon-btn" id="file-clear" title="移除文件" aria-label="移除文件">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="targets">
+        <div class="targets-label">转换为</div>
+        <div class="targets-grid" id="targets-grid"></div>
+      </div>
+      <button class="convert-btn" id="convert-btn">
+        <i class="bi bi-arrow-right-circle"></i>
+        <span>开始转换</span>
+      </button>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,92 @@
+/* 统一动画定义（全应用共用，保证动效一致） */
+
+/* 果冻弹动：点击 Dock 按钮时触发（挤压拉伸 + 回弹） */
+@keyframes jelly {
+  0%   { transform: scale(1, 1); }
+  25%  { transform: scale(1.30, 0.70); }
+  50%  { transform: scale(0.80, 1.20); }
+  75%  { transform: scale(1.12, 0.92); }
+  100% { transform: scale(1, 1); }
+}
+.dock-btn.jelly {
+  animation: jelly 0.5s var(--ease-bounce);
+}
+
+/* 标题栏按钮按下反馈 */
+@keyframes press-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.90); }
+  100% { transform: scale(1); }
+}
+.win-btn:active {
+  animation: press-pop 0.2s var(--ease-smooth);
+}
+
+/* 活动页内容淡入上移（切换页面时触发） */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page.active-page .page-inner {
+  animation: page-fade-in 0.5s var(--ease-smooth);
+}
+
+/* 首页主图标柔光呼吸 */
+@keyframes glow-breathe {
+  0%, 100% { filter: drop-shadow(0 0 18px var(--accent-glow)); }
+  50%      { filter: drop-shadow(0 0 36px var(--accent-glow)); }
+}
+.hero .hero-icon {
+  animation: glow-breathe 3.6s ease-in-out infinite;
+}
+
+/* View Transitions：禁用默认交叉淡入，仅保留主题切换的圆形辐射动画 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) { z-index: 1; }
+::view-transition-old(root) { z-index: 0; }
+
+/* 轻量提示淡入上移 */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* BitDock 靠近时缓慢漂浮（上下轻浮，鼠标离开后由 transition 平滑回落） */
+@keyframes dock-float {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+.dock.floating {
+  animation: dock-float 2.8s ease-in-out infinite alternate;
+}
+
+/* BitDock 发光层呼吸灯：透明度缓慢起伏（深色白光 / 浅色灰光同理） */
+@keyframes dock-breathe {
+  0%   { opacity: 0.35; }
+  100% { opacity: 0.95; }
+}
+
+/* ========== 工具页：文件导入卡片入场动画 ========== */
+
+/* 面板上下向中间收缩：从略高态收拢到正常高度 */
+@keyframes panel-shrink {
+  0%   { transform: scaleY(1.18); opacity: 0.6; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
+/* 文件卡片：从居中放大态滑入定位（向右移动变为列表项） */
+@keyframes card-slide-in {
+  0%   { opacity: 0; transform: translateX(35%) scale(1.15); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* 目标格式 / 转换按钮：延迟淡入上移 */
+@keyframes fade-up-delayed {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

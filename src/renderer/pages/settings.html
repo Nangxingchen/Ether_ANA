@@ -1,0 +1,68 @@
+<!-- 设置页内容片段（运行时内容已内联于 index.html 的 .page-track 中，此处为模块化源文件） -->
+<section class="page" data-page="settings">
+  <div class="page-inner">
+    <h2 class="page-title">设置</h2>
+    <p class="page-subtitle">个性化你的应用（演示占位）</p>
+    <div class="setting-row">
+      <div>
+        <div class="label">深色主题</div>
+        <div class="desc">切换深色 / 亮色界面</div>
+      </div>
+      <div class="toggle on" data-theme-toggle></div>
+    </div>
+    <div class="setting-row setting-row-column">
+      <div class="setting-row-head">
+        <div>
+          <div class="label">磨砂背景</div>
+          <div class="desc">开启后窗口背景变为磨砂玻璃效果</div>
+        </div>
+        <div class="toggle" data-bg-toggle></div>
+      </div>
+      <div class="opacity-control" id="opacity-control">
+        <span class="opacity-label">透明度</span>
+        <input type="range" id="opacity-slider" class="slider" min="0" max="100" value="40" />
+        <span class="opacity-value" id="opacity-value">40%</span>
+      </div>
+    </div>
+    <div class="setting-row setting-row-column">
+      <div class="setting-row-head">
+        <div>
+          <div class="label">自定义背景</div>
+          <div class="desc">选择图片或视频作为背景（视频≤30秒 / 1080p）</div>
+        </div>
+        <button class="bg-select-btn" id="bg-select-btn" title="选择背景文件">
+          <i class="bi bi-image"></i>
+          <span>选择</span>
+        </button>
+      </div>
+      <div class="bg-file-info" id="bg-file-info">
+        <i class="bi bi-file-earmark bg-file-icon" id="bg-file-icon"></i>
+        <span class="bg-file-name" id="bg-file-name">未选择</span>
+        <button class="icon-btn" id="bg-clear-btn" title="清除背景" aria-label="清除背景" hidden>
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="label">开机自启动</div>
+        <div class="desc">登录系统时自动启动应用</div>
+      </div>
+      <div class="toggle" data-toggle></div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="label">自动检查更新</div>
+        <div class="desc">有新版本时提醒我</div>
+      </div>
+      <div class="toggle on" data-toggle></div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="label">界面语言</div>
+        <div class="desc">当前界面显示语言</div>
+      </div>
+      <span class="about-value">简体中文</span>
+    </div>
+  </div>
+</section>

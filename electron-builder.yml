@@ -1,0 +1,54 @@
+# 以太NAN文件转换器 - electron-builder 构建配置
+# 混淆后的源代码在 build/src/，原始 src/ 不受影响
+
+appId: com.aether.nan-converter
+productName: 以太NAN文件转换器
+
+directories:
+  output: dist
+
+# 打包文件：混淆后的源代码 + 运行时资源 + package.json
+files:
+  - build/src/**/*
+  - build/assets/**/*
+  - package.json
+
+# 覆盖 package.json 中的 main 和 version（不修改源文件）
+extraMetadata:
+  main: build/src/main/main.js
+  version: 2.3.0
+
+# asar 打包（额外保护层）
+asar: true
+asarUnpack: []
+
+# Windows 目标
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/icon.ico
+
+# Electron 下载缓存到项目内
+electronDownload:
+  cache: .cache/electron
+
+# NSIS 安装器配置 - 完全原生外观，跟随系统深浅色
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  include: nsis/installer.nsh
+  uninstallDisplayName: 以太NAN文件转换器
+  artifactName: EtherNANConverter-Setup-${version}.${ext}
+  # 安装器和卸载器的图标
+  installerIcon: assets/icon.ico
+  uninstallerIcon: assets/icon.ico
+
+# 压缩
+compression: maximum

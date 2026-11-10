@@ -1,0 +1,134 @@
+/* BitDock 底部停靠栏样式 */
+.dock-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 22px 0 20px; /* 顶部留出更大区域，作为"鼠标靠近"的感应区 */
+  flex-shrink: 0;
+}
+
+.dock {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  /* 基础投影；主题发光交给 ::before 伪元素（便于呼吸动画与平滑过渡） */
+  box-shadow: var(--shadow-dock);
+  isolation: isolate;        /* 建立层叠上下文，让发光层置于背景之后 */
+  user-select: none;         /* 拖拽时避免选中文字 */
+  /* 漂浮动画结束时平滑回落到原位 */
+  transition: transform 0.4s var(--ease-smooth);
+}
+
+/* 发光层：独立伪元素承担主题发光 + 呼吸灯动画（深色白光 / 浅色灰光） */
+.dock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--dock-glow);
+  z-index: -1;
+  pointer-events: none;
+  animation: dock-breathe 3.6s ease-in-out infinite alternate;
+  transition: box-shadow 0.5s var(--ease-smooth); /* 主题切换时发光平滑过渡 */
+}
+
+/* 活动指示条：在按钮后方移动，标识当前页 */
+.dock-indicator {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  height: calc(100% - 16px);
+  width: 0;
+  border-radius: var(--radius-pill);
+  /* 活动按键背景：深色白色发光 / 浅色米白发光 */
+  background: var(--dock-active-bg);
+  box-shadow: var(--dock-active-glow), 0 0 0 1px var(--glass-border);
+  transition: transform 0.4s var(--ease-bounce), width 0.4s var(--ease-bounce),
+    background 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth);
+  pointer-events: none;
+  z-index: 0;
+}
+/* 拖拽中：即时跟随指针（无过渡）+ 玻璃拟态材质 */
+.dock-indicator.dragging {
+  transition: none;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--dock-active-glow), 0 0 0 1px var(--glass-highlight), 0 8px 24px rgba(0,0,0,0.25);
+  cursor: grabbing;
+}
+
+/* 单个 Dock 按钮 */
+.dock-btn {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  overflow: visible;
+  touch-action: none; /* 拖拽时屏蔽触摸手势干扰 */
+}
+.dock-btn i {
+  font-size: 20px;
+  transition: var(--transition-fast);
+}
+
+/* 文字标签：默认隐藏，悬停时显示 */
+.dock-label {
+  position: absolute;
+  bottom: -24px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: var(--transition-base);
+  pointer-events: none;
+}
+
+/* 悬停（JS 切换 .is-hover 或 CSS :hover）：图标上移放大 + 显示文字 */
+.dock-btn:hover,
+.dock-btn.is-hover {
+  color: var(--text-primary);
+}
+.dock-btn:hover i,
+.dock-btn.is-hover i {
+  transform: translateY(-3px) scale(1.12);
+}
+.dock-btn:hover .dock-label,
+.dock-btn.is-hover .dock-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 激活态：图标使用实色文字（双主题均可见，指示条提供强调色） */
+.dock-btn.active {
+  color: var(--text-primary);
+}
+.dock-btn.active i {
+  color: var(--text-primary);
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+}
+
+/* 拖拽落点目标按钮：高亮提示（与悬停一致的放大效果） */
+.dock-btn.drop-target {
+  color: var(--text-primary);
+}
+.dock-btn.drop-target i {
+  transform: translateY(-3px) scale(1.12);
+}

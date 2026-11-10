@@ -1,0 +1,79 @@
+/* CSS 变量：双主题配色系统（全应用共用）
+   通过 <html data-theme="light|dark"> 切换；默认 :root 兜底为深色值 */
+
+/* ---------- 亮色主题：主体白 + 字体黑 + 柠檬白(#fcffe6)为辅 ---------- */
+:root[data-theme="light"] {
+  --bg-base: #ffffff;            /* 主体白 */
+  --bg-surface: #fcffe6;         /* 柠檬白：卡片/停靠栏/表面 */
+  --bg-elevated: #ffffff;
+  --text-primary: #141414;       /* 字体黑 */
+  --text-secondary: #6b6b6b;
+  --text-muted: #9c9c9c;
+  --accent-primary: #fcffe6;     /* 柠檬白强调 */
+  --accent-gradient: linear-gradient(135deg, #fcffe6 0%, #ffffff 100%);
+  --accent-contrast: #141414;    /* 柠檬白底上的文字用黑 */
+  --accent-glow: rgba(20,20,20,0.10);
+  --glass-bg: rgba(20,20,20,0.04);
+  --glass-border: rgba(20,20,20,0.10);
+  --glass-highlight: rgba(20,20,20,0.06);
+  /* 浅色模式磨砂材质：增强毛玻璃效果提升高级感 */
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-blur-light: blur(12px) saturate(150%);
+  /* 浅色模式磨砂组件背景：使用变量替代硬编码，透明度可同步调整 */
+  --glass-bg-frosted: rgba(255, 255, 255, 0.15);
+  --shadow-dock: 0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px var(--glass-border);
+  --shadow-window: 0 20px 60px rgba(0,0,0,0.12);
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.06);
+  --dock-glow: 0 0 32px rgba(0,0,0,0.14);   /* 浅色模式：灰色发光 */
+  --dock-active-bg: rgba(252,255,230,0.72);  /* 活动按键背景：柠檬白玻璃 */
+  --dock-active-glow: 0 0 22px rgba(240,255,190,0.55);
+  --convert-btn-gradient: var(--accent-gradient); /* 浅色模式：沿用主题渐变 */
+  --convert-btn-text: var(--accent-contrast);     /* 浅色模式：沿用主题对比色 */
+  --danger: #e23e5e;
+  --warning: #c98a1a;
+  --success: #2da46a;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 18px; --radius-pill: 999px;
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.18s var(--ease-smooth);
+  --transition-base: 0.3s var(--ease-smooth);
+}
+
+/* ---------- 深色主题：主体黑 + 字体白 + 发光白色为辅（默认兜底） ---------- */
+:root[data-theme="dark"],
+:root {
+  --bg-base: #0a0a0a;            /* 主体黑 */
+  --bg-surface: #161616;
+  --bg-elevated: #1e1e1e;
+  --text-primary: #ffffff;       /* 字体白 */
+  --text-secondary: #b3b3b3;
+  --text-muted: #777777;
+  --accent-primary: #ffffff;     /* 发光白色强调 */
+  --accent-gradient: linear-gradient(135deg, #ffffff 0%, #d0d0d0 100%); /* 白色渐变 */
+  --accent-contrast: #0a0a0a;    /* 白色底上的文字用黑 */
+  --accent-glow: rgba(255,255,255,0.40); /* 白色发光 */
+  --glass-bg: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.10);
+  --glass-highlight: rgba(255,255,255,0.16);
+  /* 深色模式磨砂材质 */
+  --glass-blur: blur(16px) saturate(120%);
+  --glass-blur-light: blur(8px);
+  /* 深色模式磨砂组件背景 */
+  --glass-bg-frosted: rgba(255, 255, 255, 0.08);
+  --shadow-dock: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--glass-border);
+  --shadow-window: 0 20px 60px rgba(0,0,0,0.6);
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.4);
+  --dock-glow: 0 0 32px rgba(255,255,255,0.20); /* 深色模式：白色发光 */
+  --dock-active-bg: rgba(255,255,255,0.16);      /* 活动按键背景：白色玻璃 */
+  --dock-active-glow: 0 0 22px rgba(255,255,255,0.55);
+  --convert-btn-gradient: #ffffff; /* 工具页按钮：纯白色背景 */
+  --convert-btn-text: #000000;     /* 工具页按钮：黑色字体 */
+  --danger: #ff5c7c;
+  --warning: #ffc857;
+  --success: #4ade80;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 18px; --radius-pill: 999px;
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.18s var(--ease-smooth);
+  --transition-base: 0.3s var(--ease-smooth);
+}

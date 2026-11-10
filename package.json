@@ -1,0 +1,22 @@
+{
+  "name": "file-converter",
+  "version": "v2.3.0-Bata",
+  "description": "文件转换工作台 - 的现代玻璃拟态桌面应用",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:obfuscate": "node scripts/obfuscate.js",
+    "build:win": "node scripts/obfuscate.js && electron-builder --win",
+    "build": "node scripts/obfuscate.js && electron-builder"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
+    "javascript-obfuscator": "^5.5.0",
+    "jimp": "^1.6.1",
+    "png-to-ico": "^3.0.2"
+  },
+  "dependencies": {}
+}

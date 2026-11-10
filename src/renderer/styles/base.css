@@ -1,0 +1,146 @@
+/* 基础重置与全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 保证 [hidden] 属性生效：不被选择器特定的 display 规则覆盖 */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden; /* 应用整体不滚动，仅页面内容区滚动 */
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  /* 透明窗口：body 设为透明，主题背景交由独立 .app-bg 层承担，便于单独控制透明度 */
+  background: transparent;
+  -webkit-font-smoothing: antialiased;
+  /* 禁止软件内文字被鼠标框选（统一桌面应用体验） */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 背景层：独立于 #app，承担主题渐变背景；透明度可由 background.js 动态控制 */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-attachment: fixed;
+  /* 默认无模糊；开启磨砂后由 .frosted 提供模糊 */
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: opacity 0.8s var(--ease-smooth), backdrop-filter 0.8s var(--ease-smooth);
+}
+/* 实时调节时禁用过渡，使滑块拖动即时响应 */
+.app-bg.no-transition {
+  transition: none;
+}
+/* 磨砂背景：模糊桌面 + 半透明主题底色 = 玻璃拟态 */
+.app-bg.frosted {
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+}
+
+/* 自定义背景媒体层：图片 / 视频背景，置于 .app-bg 之后（被磨砂层模糊） */
+.bg-media-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg-base);
+  display: none;
+}
+.bg-media-layer.active {
+  display: block;
+}
+.bg-image,
+.bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+/* 亮色：米白光晕 + 主体白 */
+:root[data-theme="light"] .app-bg {
+  background:
+    radial-gradient(circle at 15% 12%, #fcffe6 0%, transparent 45%),
+    #ffffff;
+}
+/* 深色：白色光晕 + 主体黑 */
+:root[data-theme="dark"] .app-bg {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.06) 0%, transparent 45%),
+    #0a0a0a;
+}
+
+/* 应用根布局：纵向 flex（标题栏 / 页面区 / Dock），置于背景层之上 */
+#app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  /* Win10/11 原生动画：最小化/最大化/关闭/开启过渡 */
+  transition: opacity 0.18s var(--ease-smooth), transform 0.18s var(--ease-smooth);
+}
+/* 最小化中：向任务栏方向缩小 + 淡出（适配 Win10/11） */
+#app.minimizing {
+  opacity: 0;
+  transform: scale(0.9) translateY(40px);
+}
+/* 最大化/还原过渡中：交叉淡入淡出（窗口尺寸变化瞬间不可见） */
+#app.maximizing {
+  opacity: 0;
+  transform: scale(0.98);
+}
+/* 关闭中：淡出 + 轻微缩小 */
+#app.closing {
+  opacity: 0;
+  transform: scale(0.96);
+}
+/* 启动中：从轻微缩小态淡入 */
+#app.starting {
+  opacity: 0;
+  transform: scale(0.98);
+}
+/* 语言切换中：文字级别平滑淡入淡出（单个元素而非整屏） */
+.i18n-fade-out {
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.22s var(--ease-smooth), transform 0.22s var(--ease-smooth);
+}
+.i18n-fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.28s var(--ease-smooth), transform 0.28s var(--ease-smooth);
+}
+
+/* 滚动条美化（统一风格） */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--glass-highlight);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+  background-clip: padding-box;
+}
+
+/* 选中文本配色 */
+::selection {
+  background: var(--accent-glow);
+  color: var(--text-primary);
+}

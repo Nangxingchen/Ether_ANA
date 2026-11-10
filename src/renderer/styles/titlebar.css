@@ -1,0 +1,70 @@
+/* 自定义标题栏样式 */
+.titlebar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  border-bottom: 1px solid var(--glass-border);
+  -webkit-app-region: drag; /* 整个标题栏可拖拽移动窗口 */
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* 标题文字与图标 */
+.titlebar .title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+.titlebar .title i {
+  font-size: 16px;
+  /* 使用实色文字，随主题自动适配（避免亮色模式渐变文字不可见） */
+  color: inherit;
+}
+
+/* 窗口控制按钮组（不可拖拽） */
+.window-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.win-btn {
+  width: 34px;
+  height: 30px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: var(--transition-fast);
+}
+.win-btn:hover {
+  background: var(--glass-highlight);
+  color: var(--text-primary);
+}
+
+/* 关闭按钮悬停变危险红 */
+.win-btn.btn-close:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* 主题切换按钮：置于 .window-controls 之外，需单独声明 no-drag */
+.theme-toggle {
+  -webkit-app-region: no-drag;
+  margin-left: auto;   /* 将主题按钮推到右侧，与窗口控制按钮归组 */
+  margin-right: 4px;
+}

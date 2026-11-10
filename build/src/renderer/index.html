@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- 内容安全策略：允许本地资源与 Bootstrap Icons CDN -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net data:; script-src 'self'; img-src 'self' data: media:; media-src 'self' media:; connect-src 'self';" />
+  <title>文件转换工作台</title>
+  <!-- 主题初始化：在首帧渲染前应用已保存主题，避免闪烁（须早于样式加载） -->
+  <script src="scripts/theme-init.js"></script>
+  <!-- Bootstrap Icons 图标库（CDN） -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <!-- 样式模块（按顺序加载） -->
+  <link rel="stylesheet" href="styles/variables.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/titlebar.css" />
+  <link rel="stylesheet" href="styles/dock.css" />
+  <link rel="stylesheet" href="styles/pages.css" />
+  <link rel="stylesheet" href="styles/animations.css" />
+</head>
+<body>
+  <!-- 自定义背景媒体层：图片 / 视频背景，置于 .app-bg 之后（被磨砂层模糊） -->
+  <div class="bg-media-layer" id="bg-media-layer">
+    <img class="bg-image" id="bg-image" alt="" hidden />
+    <video class="bg-video" id="bg-video" muted loop playsinline hidden></video>
+  </div>
+  <!-- 独立背景层：承担主题渐变背景，透明度可由 background.js 动态控制 -->
+  <div class="app-bg" id="app-bg"></div>
+  <div id="app">
+    <!-- 自定义标题栏（整体可拖拽，按钮区为 no-drag） -->
+    <header class="titlebar">
+      <div class="title">
+        <span class="brand-logo" data-i18n="app.brand">NAN</span>
+        <span data-i18n="app.title">文件转换工作台</span>
+      </div>
+      <!-- 主题切换按钮（置于窗口控制按钮之前，单独声明 no-drag） -->
+      <button id="btn-theme" class="win-btn theme-toggle" data-i18n="theme.toggle" title="切换主题" aria-label="切换主题">
+        <i class="bi bi-moon-stars"></i>
+      </button>
+      <div class="window-controls">
+        <button id="btn-minimize" class="win-btn" data-i18n="win.minimize" title="最小化" aria-label="最小化">
+          <i class="bi bi-dash-lg"></i>
+        </button>
+        <button id="btn-maximize" class="win-btn" data-i18n="win.maximize" title="最大化" aria-label="最大化/还原">
+          <i class="bi bi-square"></i>
+        </button>
+        <button id="btn-close" class="win-btn btn-close" data-i18n="win.close" title="关闭" aria-label="关闭">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- 页面容器：横向轨道，4 页并排，通过 translateX 滑动切换 -->
+    <main class="page-container">
+      <div class="page-track">
+        <!-- 首页 -->
+        <section class="page active-page" data-page="home">
+          <div class="page-inner">
+            <div class="hero">
+              <!-- NAN 笔画动画 logo（首页开场）：SVG 描边流线动画 + 圆角样式，点击可重放 -->
+              <svg class="nan-logo" id="hero-nan-logo" viewBox="0 0 240 100" aria-label="NAN" title="NAN">
+                <text class="nan-text" id="hero-nan-text" x="120" y="78" text-anchor="middle">NAN</text>
+              </svg>
+              <!-- 标题：流线笔画动画（浅色→黑色 / 深色→白色），点击重放 NAN + 标题动画 -->
+              <h1 id="hero-title" class="hero-title-text" data-i18n="app.title">文件转换工作台</h1>
+              <p data-i18n="home.description">一个现代化的桌面文件转换工作台，基于 Electron 构建。集成多种格式转换工具，简洁高效，专注体验。</p>
+              <div class="hero-tags">
+                <span class="tag" data-i18n="home.tag.focused">专注</span>
+                <span class="tag" data-i18n="home.tag.professional">专业</span>
+                <span class="tag" data-i18n="home.tag.simple">简约</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 工具页：单屏文件转换（无滚动，演示） -->
+        <section class="page" data-page="tools">
+          <div class="page-inner tools-inner">
+            <div class="tools-head">
+              <h2 class="page-title" data-i18n="tools.title">文件转换</h2>
+              <p class="page-subtitle" data-i18n="tools.subtitle">拖拽或点击导入文件，自动识别格式并给出转换选项</p>
+            </div>
+
+            <!-- 空状态：导入区 -->
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="file-input" hidden />
+              <i class="bi bi-cloud-arrow-up dz-icon"></i>
+              <p class="dz-title" data-i18n="tools.dropzone.title">拖拽文件到此处</p>
+              <p class="dz-hint" data-i18n="tools.dropzone.hint">或点击选择 · 支持视频 / 文档 / 图书 / 图片 / 音频</p>
+            </div>
+
+            <!-- 已导入状态：转换面板 -->
+            <div class="convert-panel" id="convert-panel" hidden>
+              <div class="file-card">
+                <i class="bi bi-file-earmark-text" id="file-icon"></i>
+                <div class="file-meta">
+                  <div class="file-name" id="file-name">文件名.ext</div>
+                  <div class="file-info" id="file-info">大小 · 类型</div>
+                </div>
+                <button class="icon-btn" id="file-clear" data-i18n="tools.fileClear" title="移除文件" aria-label="移除文件">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+              <div class="targets">
+                <div class="targets-label" data-i18n="tools.convertTo">转换为</div>
+                <div class="targets-grid" id="targets-grid">
+                  <span class="targets-indicator" id="targets-indicator"></span>
+                </div>
+              </div>
+              <button class="convert-btn" id="convert-btn">
+                <span class="btn-progress"></span>
+                <span class="btn-progress-text" id="btn-progress-text">0%</span>
+                <span class="btn-text" data-i18n-chars="tools.convert">
+                  <span class="char">开</span><span class="char">始</span><span class="char">转</span><span class="char">换</span>
+                </span>
+                <i class="bi bi-arrow-right btn-arrow"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 关于页（可滚动，隐藏滚动条） -->
+        <section class="page" data-page="about">
+          <div class="page-inner about-inner">
+            <h2 class="page-title" data-i18n="about.title">关于</h2>
+            <p class="page-subtitle" data-i18n="about.subtitle">了解这款应用</p>
+
+            <!-- 应用信息卡片 -->
+            <div class="glass-card">
+              <div class="about-row"><span class="about-label" data-i18n="about.appName">应用名称</span><span class="about-value" data-i18n="app.title">文件转换工作台</span></div>
+              <div class="about-row"><span class="about-label" data-i18n="about.version">版本</span><span class="about-value">1.0.0</span></div>
+              <div class="about-row"><span class="about-label" data-i18n="about.framework">技术框架</span><span class="about-value">@Nanxingchen</span></div>
+              <div class="about-row"><span class="about-label" data-i18n="about.theme">界面主题</span><span class="about-value">Windows / Linux / MacOS</span></div>
+            </div>
+
+            <!-- 作者介绍 -->
+            <div class="about-card about-author">
+              <div class="about-card-head">
+                <h3 class="about-card-title" data-i18n="about.author">作者</h3>
+              </div>
+              <div class="profile">
+                <!-- 作者头像（圆形，点击触发旋转动画） -->
+                <div class="avatar-wrap" id="author-avatar-wrap">
+                  <img class="avatar" id="author-avatar" src="assets/author-avatar.jpg" alt="作者头像" />
+                </div>
+                <div class="profile-info">
+                  <div class="profile-name">Nangxingchen</div>
+                  <div class="profile-bio" data-i18n="about.author.bio">一个平平无奇的社区开发者</div>
+                  <div class="profile-links">
+                    <a class="profile-link" href="https://github.com/Nangxingchen" target="_blank" rel="noopener">
+                      <i class="bi bi-github"></i><span>GitHub</span>
+                    </a>
+                    <a class="profile-link" href="https://space.bilibili.com/3546605890308501" target="_blank" rel="noopener">
+                      <i class="bi bi-play-btn"></i><span>bilibili</span>
+                    </a>
+                    <a class="profile-link" href="mailto:nxc_2007@163.com">
+                      <i class="bi bi-envelope"></i><span>nxc_2007@163.com</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 工作室介绍 -->
+            <div class="about-card about-studio">
+              <div class="about-card-head">
+                <h3 class="about-card-title" data-i18n="about.studio">工作室</h3>
+              </div>
+              <div class="profile">
+                <!-- 工作室头像（圆形，点击触发旋转动画） -->
+                <div class="avatar-wrap" id="studio-avatar-wrap">
+                  <img class="avatar" id="studio-avatar" src="assets/logo.jpg" alt="工作室 logo" />
+                </div>
+                <div class="profile-info">
+                  <div class="profile-name" data-i18n="about.studio.name">无公害工作室</div>
+                  <div class="profile-bio" data-i18n="about.studio.bio">无公害工作室</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 友链 -->
+            <div class="about-card about-friends">
+              <div class="about-card-head">
+                <h3 class="about-card-title" data-i18n="about.friends">友链</h3>
+              </div>
+              <div class="friends-empty">
+                <span data-i18n="about.friends.empty">暂无</span>
+                <span class="dot-bounce"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+              </div>
+            </div>
+
+            <p class="about-footer" data-i18n="about.footer">使用 Electron + 玻璃拟态深色主题构建。</p>
+          </div>
+        </section>
+
+        <!-- 设置页 -->
+        <section class="page" data-page="settings">
+          <div class="page-inner">
+            <h2 class="page-title" data-i18n="settings.title">设置</h2>
+            <p class="page-subtitle" data-i18n="settings.subtitle">个性化你的应用</p>
+
+            <!-- 深色主题 + 跟随系统 -->
+            <div class="setting-row setting-row-column">
+              <div class="setting-row-head">
+                <div>
+                  <div class="label" data-i18n="settings.darkTheme">深色主题</div>
+                  <div class="desc" data-i18n="settings.darkTheme.desc">切换深色 / 亮色界面</div>
+                </div>
+                <div class="toggle on" data-theme-toggle></div>
+              </div>
+              <button class="follow-system-btn" id="theme-follow-system" title="跟随系统">
+                <i class="bi bi-arrow-repeat"></i>
+                <span data-i18n="settings.followSystem">跟随系统</span>
+              </button>
+            </div>
+
+            <div class="setting-row setting-row-column">
+              <div class="setting-row-head">
+                <div>
+                  <div class="label" data-i18n="settings.frostedBg">磨砂背景</div>
+                  <div class="desc" data-i18n="settings.frostedBg.desc">开启后窗口背景变为磨砂玻璃效果</div>
+                </div>
+                <div class="toggle" data-bg-toggle></div>
+              </div>
+              <div class="opacity-control" id="opacity-control">
+                <span class="opacity-label" data-i18n="settings.opacity">透明度</span>
+                <input type="range" id="opacity-slider" class="slider" min="0" max="100" value="0" />
+                <span class="opacity-value" id="opacity-value">0%</span>
+              </div>
+            </div>
+            <div class="setting-row setting-row-column">
+              <div class="setting-row-head">
+                <div>
+                  <div class="label" data-i18n="settings.customBg">自定义背景</div>
+                  <div class="desc" data-i18n="settings.customBg.desc">选择图片或视频作为背景（视频≤30秒 / 1080p）</div>
+                </div>
+                <button class="bg-select-btn" id="bg-select-btn" data-i18n="settings.select" title="选择背景文件">
+                  <i class="bi bi-image"></i>
+                  <span data-i18n="settings.select">选择</span>
+                </button>
+              </div>
+              <div class="bg-file-info" id="bg-file-info">
+                <i class="bi bi-file-earmark bg-file-icon" id="bg-file-icon"></i>
+                <span class="bg-file-name" id="bg-file-name" data-i18n="settings.noFile">未选择</span>
+                <button class="icon-btn" id="bg-clear-btn" data-i18n="settings.clearBg" title="清除背景" aria-label="清除背景" hidden>
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="label" data-i18n="settings.autostart">开机自启动</div>
+                <div class="desc" data-i18n="settings.autostart.desc">登录系统时自动启动应用</div>
+              </div>
+              <div class="toggle" data-toggle id="autostart-toggle"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="label" data-i18n="settings.autoUpdate">自动检查更新</div>
+                <div class="desc" data-i18n="settings.autoUpdate.desc">有新版本时提醒我</div>
+              </div>
+              <div class="toggle on" data-toggle id="autoupdate-toggle"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="label" data-i18n="settings.tray">系统托盘</div>
+                <div class="desc" data-i18n="settings.tray.desc">在系统托盘显示图标，关闭后不显示</div>
+              </div>
+              <div class="toggle" data-toggle id="tray-toggle"></div>
+            </div>
+
+            <!-- 语言 + 跟随系统 -->
+            <div class="setting-row setting-row-column">
+              <div class="setting-row-head">
+                <div>
+                  <div class="label" data-i18n="settings.language">界面语言</div>
+                  <div class="desc" data-i18n="settings.language.desc">当前界面显示语言</div>
+                </div>
+                <button class="follow-system-btn" id="lang-follow-system" title="跟随系统">
+                  <i class="bi bi-arrow-repeat"></i>
+                  <span data-i18n="settings.followSystem">跟随系统</span>
+                </button>
+              </div>
+              <!-- 语言切换器：按钮组 + 滑动指示器（类似 BitDock，无拖拽） -->
+              <div class="lang-switcher" id="lang-switcher">
+                <span class="lang-indicator" id="lang-indicator"></span>
+                <button class="lang-btn active" data-lang="zh-CN">简体中文</button>
+                <button class="lang-btn" data-lang="zh-TW">繁體中文</button>
+                <button class="lang-btn" data-lang="en">English</button>
+                <button class="lang-btn" data-lang="ja">日本語</button>
+                <button class="lang-btn" data-lang="ko">한국어</button>
+              </div>
+            </div>
+
+            <div class="setting-row setting-row-column">
+              <div class="setting-row-head">
+                <div>
+                  <div class="label" data-i18n="settings.savePath">保存位置</div>
+                  <div class="desc" data-i18n="settings.savePath.desc">文件转换后的默认保存目录</div>
+                </div>
+                <button class="bg-select-btn" id="save-select-btn" data-i18n="settings.selectPath" title="选择保存目录">
+                  <i class="bi bi-folder-symlink"></i>
+                  <span data-i18n="settings.selectPath">选择</span>
+                </button>
+              </div>
+              <div class="save-path-switcher" id="save-path-switcher">
+                <span class="save-path-indicator" id="save-path-indicator"></span>
+                <button class="save-path-btn active" data-save-mode="default" data-i18n="settings.saveDefault">系统文档目录</button>
+                <button class="save-path-btn" data-save-mode="custom" data-i18n="settings.saveCustom">自定义</button>
+              </div>
+              <div class="save-path-display" id="save-path-display">
+                <i class="bi bi-folder"></i>
+                <span id="save-path-text" title=""></span>
+              </div>
+            </div>
+
+            <!-- 清理缓存 -->
+            <div class="setting-row">
+              <div>
+                <div class="label" data-i18n="settings.clearCache">清理缓存</div>
+                <div class="desc" data-i18n="settings.clearCache.desc">清除应用缓存数据</div>
+              </div>
+              <button class="bg-select-btn" id="clear-cache-btn" title="清理缓存">
+                <i class="bi bi-trash3"></i>
+                <span data-i18n="settings.clearCache">清理缓存</span>
+              </button>
+
+            </div>
+
+            <!-- 恢复默认设置 -->
+            <div class="setting-row">
+              <div>
+                <div class="label" data-i18n="settings.restore">恢复默认设置</div>
+                <div class="desc" data-i18n="settings.restore.desc">将所有设置恢复为初始状态</div>
+              </div>
+              <button class="bg-select-btn danger" id="restore-settings-btn" title="恢复默认设置">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                <span data-i18n="settings.restore">恢复默认设置</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- BitDock 底部停靠栏：页面切换控制 -->
+    <div class="dock-wrap">
+      <nav class="dock">
+        <span class="dock-indicator"></span>
+        <button class="dock-btn active" data-page="home" data-index="0">
+          <i class="bi bi-house-door-fill"></i>
+          <span class="dock-label" data-i18n="nav.home">首页</span>
+        </button>
+        <button class="dock-btn" data-page="tools" data-index="1">
+          <i class="bi bi-grid-1x2-fill"></i>
+          <span class="dock-label" data-i18n="nav.tools">工具</span>
+        </button>
+        <button class="dock-btn" data-page="about" data-index="2">
+          <i class="bi bi-info-circle-fill"></i>
+          <span class="dock-label" data-i18n="nav.about">关于</span>
+        </button>
+        <button class="dock-btn" data-page="settings" data-index="3">
+          <i class="bi bi-gear-fill"></i>
+          <span class="dock-label" data-i18n="nav.settings">设置</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- 渲染层脚本入口（ES 模块） -->
+  <script type="module" src="scripts/renderer.js"></script>
+</body>
+</html>
